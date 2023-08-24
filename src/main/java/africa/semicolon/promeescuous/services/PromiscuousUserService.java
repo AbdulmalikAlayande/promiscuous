@@ -9,6 +9,7 @@ import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
 import africa.semicolon.promeescuous.exceptions.UserNotFoundException;
 import africa.semicolon.promeescuous.models.Address;
 import africa.semicolon.promeescuous.models.Interest;
+import africa.semicolon.promeescuous.models.Location;
 import africa.semicolon.promeescuous.models.User;
 import africa.semicolon.promeescuous.repositories.UserRepository;
 import africa.semicolon.promeescuous.services.cloud.CloudService;
@@ -23,11 +24,9 @@ import com.github.fge.jsonpatch.ReplaceOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static africa.semicolon.promeescuous.dtos.responses.ResponseMessage.*;
+import static africa.semicolon.promeescuous.dtos.responses.SuccessResponse.UPDATE_SUCCESSFUL;
 import static africa.semicolon.promeescuous.exceptions.ExceptionMessage.*;
 import static africa.semicolon.promeescuous.utils.AppUtil.*;
 import static africa.semicolon.promeescuous.utils.JwtUtil.*;
@@ -48,6 +48,8 @@ public class PromiscuousUserService implements UserService{
     private final MailService mailService;
     private final AppConfig appConfig;
     private final CloudService cloudService;
+    private final AddressService addressService;
+    private final ModelMapper mapper;
 
     @Override
     public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
@@ -64,7 +66,7 @@ public class PromiscuousUserService implements UserService{
         registerUserResponse.setMessage(USER_REGISTRATION_SUCCESSFUL.name());
         return registerUserResponse;
     }
-
+    
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
@@ -163,7 +165,7 @@ public class PromiscuousUserService implements UserService{
             //4. Save updatedUser from step 3 in the DB
             var savedUser=userRepository.save(user);
             log.info("user-->{}", savedUser);
-            return new UpdateUserResponse(PROFILE_UPDATE_SUCCESSFUL.name());
+            return new UpdateUserResponse(UPDATE_SUCCESSFUL.name());
         }catch (JsonPatchException exception){
             throw new PromiscuousBaseException(exception.getMessage());
         }
@@ -233,7 +235,20 @@ public class PromiscuousUserService implements UserService{
         var activateUserResponse = buildActivateUserResponse(userResponse);
         return ApiResponse.builder().data(activateUserResponse).build();
     }
-
+    
+    @Override
+    public List<GetUserResponse> suggestFriendsBasedOn(Location location) {
+        List<GetAddressResponse> matchedAddresses = addressService.getAddressBy(location);
+        List<GetUserResponse> suggestedFriends = new ArrayList<>();
+        matchedAddresses.forEach(address->{
+            Optional<User> foundUser = userRepository.findById(address.getId());
+            foundUser.ifPresent(user -> {
+                GetUserResponse userResponse = mapper.map(user, GetUserResponse.class);
+                suggestedFriends.add(userResponse);
+            });
+        });
+        return suggestedFriends;
+    }
     private static ActivateAccountResponse buildActivateUserResponse(GetUserResponse userResponse) {
         return ActivateAccountResponse.builder()
                 .message(ACCOUNT_ACTIVATION_SUCCESSFUL.name())

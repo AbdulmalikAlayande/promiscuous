@@ -1,10 +1,16 @@
+
 package africa.semicolon.promeescuous.config;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@EnableAutoConfiguration
 public class AppConfig {
     @Value("${mail.api.key}")
     private String mailApiKey;
@@ -24,7 +30,16 @@ public class AppConfig {
 
     @Value("${cloud.api.key}")
     private String cloudApiKey;
-
+    
+    @Bean
+    public ModelMapper getMapper(){
+        return new ModelMapper();
+    }
+    @Bean
+    public ObjectMapper getObjectMapper(){
+        return new ObjectMapper();
+    }
+    
     public String getMailApiKey() {
         return mailApiKey;
     }

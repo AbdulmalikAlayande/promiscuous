@@ -1,4 +1,4 @@
-package africa.semicolon.promiscuous.dtos.response;
+package africa.semicolon.promeescuous.dtos.responses;
 
 public enum ResponseMessage {
     USER_REGISTRATION_SUCCESSFUL,

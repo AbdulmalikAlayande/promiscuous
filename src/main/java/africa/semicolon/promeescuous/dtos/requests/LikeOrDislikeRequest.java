@@ -1,6 +1,6 @@
-package africa.semicolon.promiscuous.dtos.request;
+package africa.semicolon.promeescuous.dtos.requests;
 
-import africa.semicolon.promiscuous.models.Reaction;
+import africa.semicolon.promeescuous.models.Reaction;
 import lombok.Getter;
 import lombok.Setter;
 

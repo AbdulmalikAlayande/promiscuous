@@ -1,16 +1,21 @@
 package africa.semicolon.promeescuous.controllers;
 
 
+import africa.semicolon.promeescuous.dtos.requests.LikeOrDislikeRequest;
 import africa.semicolon.promeescuous.dtos.requests.RegisterUserRequest;
 import africa.semicolon.promeescuous.dtos.requests.UpdateUserRequest;
+import africa.semicolon.promeescuous.dtos.requests.UploadMediaRequest;
 import africa.semicolon.promeescuous.dtos.responses.GetUserResponse;
 import africa.semicolon.promeescuous.dtos.responses.RegisterUserResponse;
 import africa.semicolon.promeescuous.dtos.responses.UpdateUserResponse;
+import africa.semicolon.promeescuous.dtos.responses.UploadMediaResponse;
+import africa.semicolon.promeescuous.models.Reaction;
 import africa.semicolon.promeescuous.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/user")

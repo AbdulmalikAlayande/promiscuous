@@ -1,7 +1,11 @@
 package africa.semicolon.promeescuous.repositories;
 
 import africa.semicolon.promeescuous.models.Media;
+import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 public interface MediaRepository extends JpaRepository<Media, Long> {
     boolean existsByUser(User user);
