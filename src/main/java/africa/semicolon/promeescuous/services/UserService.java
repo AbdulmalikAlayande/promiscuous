@@ -5,6 +5,7 @@ import africa.semicolon.promeescuous.dtos.requests.RegisterUserRequest;
 import africa.semicolon.promeescuous.dtos.requests.UpdateUserRequest;
 import africa.semicolon.promeescuous.dtos.responses.*;
 import africa.semicolon.promeescuous.models.Location;
+import africa.semicolon.promeescuous.models.User;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface UserService {
     UpdateUserResponse updateProfile(UpdateUserRequest updateUserRequest, Long id);
 	
 	List<GetUserResponse> suggestFriendsBasedOn(Location location);
+	
+	List<User> suggestUserByInterest(Long userId);
 }

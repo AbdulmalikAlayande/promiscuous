@@ -249,6 +249,21 @@ public class PromiscuousUserService implements UserService{
         });
         return suggestedFriends;
     }
+    
+    @Override
+    public List<User> suggestUserByInterest(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) throw new RuntimeException("User Not Found");
+        User user = optionalUser.get();
+        
+        Set<Interest> userInterests = user.getInterests();
+        
+        return userRepository.findAll()
+                       .stream()
+                       .filter(otherUsers-> !otherUsers.getId().equals(userId))
+                       .filter(otherUsers -> !Collections.disjoint(userInterests, otherUsers.getInterests()))
+                       .collect(Collectors.toList());
+    }
     private static ActivateAccountResponse buildActivateUserResponse(GetUserResponse userResponse) {
         return ActivateAccountResponse.builder()
                 .message(ACCOUNT_ACTIVATION_SUCCESSFUL.name())

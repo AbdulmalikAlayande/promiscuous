@@ -10,6 +10,7 @@ import africa.semicolon.promeescuous.dtos.responses.LoginResponse;
 import africa.semicolon.promeescuous.dtos.responses.UpdateUserResponse;
 import africa.semicolon.promeescuous.exceptions.BadCredentialsException;
 import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
+import africa.semicolon.promeescuous.models.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +108,31 @@ public class UserServiceTest {
         assertThat(fullName).isEqualTo(expectedFullName);
 
     }
+    
+    @Test
+    public void testThatUserCanBeSuggestedByInterest() {
+        Set<String> firstInterests = Set.of("music", "reading");
+        Set<String> secondInterests = Set.of("Sport", "Coding");
+        Set<String> thirdInterests = Set.of("Sport", "Coding");
+        Set<String> forthInterests = Set.of("Sport", "coding");
+        
+        UpdateUserRequest updateUserRequest = buildUpdateRequest();
+        updateUserRequest.setInterests(firstInterests);
+        UpdateUserResponse response = userService.updateProfile(updateUserRequest, 501L);
+        
+        updateUserRequest.setInterests(secondInterests);
+        userService.updateProfile(updateUserRequest, 502L);
+        
+        updateUserRequest.setInterests(thirdInterests);
+        userService.updateProfile(updateUserRequest, 503L);
+        
+        updateUserRequest.setInterests(forthInterests);
+        userService.updateProfile(updateUserRequest, 504L);
+        
+        List<User> usersWithCommonInterests = userService.suggestUserByInterest(504L);
+        
+        assertThat(usersWithCommonInterests.size()).isGreaterThan(0);
+    }
 
     private UpdateUserRequest buildUpdateRequest() {
         Set<String> interests = Set.of("swimming", "sports", "cooking");
@@ -134,8 +160,8 @@ public class UserServiceTest {
             throw new PromiscuousBaseException(exception.getMessage());
         }
     }
-
 }
+
 
 
 
