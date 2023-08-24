@@ -6,7 +6,9 @@ import africa.semicolon.promeescuous.dtos.requests.RegisterUserRequest;
 import africa.semicolon.promeescuous.dtos.requests.UpdateUserRequest;
 import africa.semicolon.promeescuous.dtos.requests.UploadMediaRequest;
 import africa.semicolon.promeescuous.dtos.responses.*;
+import africa.semicolon.promeescuous.exceptions.UserNotFoundException;
 import africa.semicolon.promeescuous.services.UserService;
+import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +28,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GetUserResponse> getUserById(@PathVariable Long id){
+    public ResponseEntity<GetUserResponse> getUserById(@PathVariable Long id) throws UserNotFoundException {
         GetUserResponse user = userService.getUserById(id);
         return ResponseEntity.ok().body(user);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UpdateUserResponse> updateUserProfile(@ModelAttribute UpdateUserRequest updateUserRequest, @PathVariable Long id){
+    public ResponseEntity<UpdateUserResponse> updateUserProfile(@ModelAttribute UpdateUserRequest updateUserRequest, @PathVariable Long id) throws JsonPatchException {
         UpdateUserResponse response=userService.updateProfile(updateUserRequest, id);
         return ResponseEntity.ok(response);
     }

@@ -24,7 +24,6 @@ import static africa.semicolon.promeescuous.exceptions.ExceptionMessage.USER_NOT
 @AllArgsConstructor
 @Slf4j
 public class PromiscuousDirectMessage implements DirectMessageService {
-    @Autowired
     private final UserService userService;
     private final DirectMessageRepository directMessageRepository;
 

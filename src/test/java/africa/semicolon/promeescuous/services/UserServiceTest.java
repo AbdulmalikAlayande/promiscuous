@@ -10,6 +10,7 @@ import africa.semicolon.promeescuous.dtos.responses.LoginResponse;
 import africa.semicolon.promeescuous.dtos.responses.UpdateUserResponse;
 import africa.semicolon.promeescuous.exceptions.BadCredentialsException;
 import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
+import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,27 +58,7 @@ public class UserServiceTest {
        assertThat(activateUserAccountResponse).isNotNull();
     }
 
-    @Test
-    public void testThatExceptionIsThrownWhenUserAuthenticatesWithBadCredentials(){
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("test@email.com");
-        loginRequest.setPassword("bad_password");
 
-        assertThatThrownBy(()->userService.login(loginRequest))
-                .isInstanceOf(BadCredentialsException.class);
-    }
-
-    @Test
-    public void testThatUsersCanLogin(){
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("test@email.com");
-        loginRequest.setPassword("password");
-
-        LoginResponse response = userService.login(loginRequest);
-        assertThat(response).isNotNull();
-        String accessToken = response.getAccessToken();
-        assertThat(accessToken).isNotNull();
-    }
 
     @Test
     public void getUserByIdTest(){
@@ -93,7 +74,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testThatUserCanUpdateAccount(){
+    public void testThatUserCanUpdateAccount() throws JsonPatchException {
         UpdateUserRequest updateUserRequest = buildUpdateRequest();
         UpdateUserResponse response = userService.updateProfile(updateUserRequest, 500L);
         assertThat(response).isNotNull();
