@@ -41,7 +41,7 @@ import static africa.semicolon.promeescuous.utils.JwtUtil.isValidJwt;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class PromiscuousUserService implements UserService{
+public class PromiscuousUserService implements UserService {
     private final UserRepository userRepository;
     private final MailService mailService;
     private final AppConfig appConfig;
@@ -267,4 +267,6 @@ public class PromiscuousUserService implements UserService{
         request.setMailContent(mailContent);
         return request;
     }
+
+
 }

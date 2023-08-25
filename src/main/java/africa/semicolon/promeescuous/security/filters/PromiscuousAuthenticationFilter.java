@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static africa.semicolon.promeescuous.utils.JwtUtil.generateToken;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @AllArgsConstructor

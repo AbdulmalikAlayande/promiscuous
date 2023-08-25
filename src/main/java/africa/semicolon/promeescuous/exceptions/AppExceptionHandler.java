@@ -13,9 +13,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @RestControllerAdvice
 public class AppExceptionHandler {
 
-    @ExceptionHandler(value = {PromiscuousBaseException.class})
+    @ExceptionHandler(value = Exception.class)
     @ResponseStatus(BAD_REQUEST)
-    public ResponseEntity<?> handler(PromiscuousBaseException exception){
+    public ResponseEntity<?> handleException(Exception exception){
         var response = ApiResponse.builder().data(exception.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
