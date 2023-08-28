@@ -35,7 +35,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UpdateUserResponse> updateUserProfile(@ModelAttribute UpdateUserRequest updateUserRequest, @PathVariable Long id) throws JsonPatchException {
-        UpdateUserResponse response=userService.updateProfile(updateUserRequest, id);
+        UpdateUserResponse response = userService.updateProfile(updateUserRequest, id);
         return ResponseEntity.ok(response);
     }
     @PostMapping("/uploadMedia")
@@ -44,7 +44,7 @@ public class UserController {
         UploadMediaResponse response = userService.uploadMedia(mediaToUpload);
         return ResponseEntity.ok(response);
     }
-    @PostMapping("uploadProfilePicture")
+    @PostMapping("/uploadProfilePicture")
     public ResponseEntity<UploadMediaResponse> uploadProfilePicture(@ModelAttribute UploadMediaRequest mediaRequest){
         MultipartFile mediaToUpload = mediaRequest.getMedia();
         UploadMediaResponse response = userService.uploadProfilePicture(mediaToUpload);

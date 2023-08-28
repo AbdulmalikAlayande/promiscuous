@@ -1,16 +1,18 @@
 package africa.semicolon.promeescuous.models;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Set;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -60,4 +62,5 @@ public class User {
         createdAt = currentTime.format(formatter);
 
     }
+
 }

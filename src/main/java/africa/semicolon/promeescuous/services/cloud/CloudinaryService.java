@@ -1,7 +1,6 @@
 package africa.semicolon.promeescuous.services.cloud;
 
 import africa.semicolon.promeescuous.config.AppConfig;
-import africa.semicolon.promeescuous.dtos.responses.ApiResponse;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Uploader;
 import com.cloudinary.utils.ObjectUtils;

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static africa.semicolon.promeescuous.utils.AppUtil.generateActivationLink;
-import static africa.semicolon.promeescuous.utils.JwtUtil.generateToken;
+import static africa.semicolon.promeescuous.utils.JwtUtil.generateVerificationToken;
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -28,7 +28,7 @@ class AppUtilsTest {
     @Test
     public void generateTokenTest() {
         String email = "test@email.com";
-        String token = generateToken(email);
+        String token = generateVerificationToken(email);
         log.info("generated token--->{}", token);
         assertThat(token).isNotNull();
     }
