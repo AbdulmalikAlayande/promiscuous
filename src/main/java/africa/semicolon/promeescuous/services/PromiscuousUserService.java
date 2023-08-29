@@ -6,10 +6,7 @@ import africa.semicolon.promeescuous.dtos.responses.*;
 import africa.semicolon.promeescuous.exceptions.AccountActivationFailedException;
 import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
 import africa.semicolon.promeescuous.exceptions.UserNotFoundException;
-import africa.semicolon.promeescuous.models.Address;
-import africa.semicolon.promeescuous.models.Interest;
-import africa.semicolon.promeescuous.models.Role;
-import africa.semicolon.promeescuous.models.User;
+import africa.semicolon.promeescuous.models.*;
 import africa.semicolon.promeescuous.repositories.UserRepository;
 import africa.semicolon.promeescuous.services.cloud.CloudService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -92,7 +89,9 @@ public class PromiscuousUserService implements UserService {
         User user = foundUser.orElseThrow(
                 ()->new UserNotFoundException(USER_NOT_FOUND_EXCEPTION.getMessage())
         );
+        Media media = mediaService.getMediaByUser(user);
         GetUserResponse getUserResponse = buildUserResponse(user);
+        getUserResponse.setProfileImage(media.getUrl());
         return getUserResponse;
     }
 
@@ -102,8 +101,8 @@ public class PromiscuousUserService implements UserService {
         Page<User> usersPage = userRepository.findAll(pageable);
         List<User> foundUsers = usersPage.getContent();
         return foundUsers.stream()
-                .map(user-> buildUserResponse(user))
-                .toList();
+                         .map(user-> buildUserResponse(user))
+                         .toList();
     }
 
 
@@ -111,9 +110,9 @@ public class PromiscuousUserService implements UserService {
     @Override
     public UpdateUserResponse updateProfile(UpdateUserRequest updateUserRequest, Long id) throws JsonPatchException {
         ModelMapper modelMapper = new ModelMapper();
-        String url = uploadImage(updateUserRequest.getProfileImage());
-
         User user = findUserById(id);
+
+        mediaService.uploadMedia(updateUserRequest.getProfileImage(), user);
 
         Set<String> userInterests = updateUserRequest.getInterests();
         Set<Interest> interests = parseInterestsFrom(userInterests);
@@ -129,7 +128,7 @@ public class PromiscuousUserService implements UserService {
 
     @Override
     public UploadMediaResponse uploadMedia(MultipartFile mediaToUpload) {
-        return mediaService.uploadMedia(mediaToUpload);
+        return null;
     }
 
     @Override

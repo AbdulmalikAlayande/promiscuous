@@ -13,7 +13,6 @@ import java.util.List;
 
 @AllArgsConstructor
 public class SecureUser implements UserDetails {
-
     private final User user;
 
     @Override
