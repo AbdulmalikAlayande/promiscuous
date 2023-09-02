@@ -4,7 +4,6 @@ import africa.semicolon.promeescuous.config.AppConfig;
 import africa.semicolon.promeescuous.dtos.requests.*;
 import africa.semicolon.promeescuous.dtos.responses.*;
 import africa.semicolon.promeescuous.exceptions.AccountActivationFailedException;
-import africa.semicolon.promeescuous.exceptions.BadCredentialsException;
 import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
 import africa.semicolon.promeescuous.exceptions.UserNotFoundException;
 import africa.semicolon.promeescuous.models.Address;
@@ -38,7 +37,8 @@ import static africa.semicolon.promeescuous.dtos.responses.ResponseMessage.*;
 import static africa.semicolon.promeescuous.dtos.responses.SuccessResponse.UPDATE_SUCCESSFUL;
 import static africa.semicolon.promeescuous.exceptions.ExceptionMessage.*;
 import static africa.semicolon.promeescuous.utils.AppUtil.*;
-import static africa.semicolon.promeescuous.utils.JwtUtil.*;
+import static africa.semicolon.promeescuous.utils.JwtUtil.extractEmailFrom;
+import static africa.semicolon.promeescuous.utils.JwtUtil.isValidJwt;
 
 @Service
 @Slf4j
@@ -50,6 +50,8 @@ public class PromiscuousUserService implements UserService{
     private final CloudService cloudService;
     private final AddressService addressService;
     private final ModelMapper mapper;
+
+    private final MediaService mediaService;
 
     @Override
     public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
@@ -66,27 +68,6 @@ public class PromiscuousUserService implements UserService{
         registerUserResponse.setMessage(USER_REGISTRATION_SUCCESSFUL.name());
         return registerUserResponse;
     }
-    
-    @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        String email = loginRequest.getEmail();
-        String password = loginRequest.getPassword();
-        Optional<User> foundUser = userRepository.readByEmail(email);
-        User user = foundUser.orElseThrow(()->new UserNotFoundException(
-                String.format(USER_WITH_EMAIL_NOT_FOUND_EXCEPTION.getMessage(), email)
-        ));
-        boolean isValidPassword = matches(user.getPassword(), password);
-        if (isValidPassword) return buildLoginResponse(email);
-        throw new BadCredentialsException(INVALID_CREDENTIALS_EXCEPTION.getMessage());
-    }
-
-    private static LoginResponse buildLoginResponse(String email) {
-        String accessToken = generateToken(email);
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setAccessToken(accessToken);
-        return loginResponse;
-    }
-
 
     @Override
     public ApiResponse<?> activateUserAccount(String token) {
@@ -99,13 +80,12 @@ public class PromiscuousUserService implements UserService{
     }
 
     @Override
-    public GetUserResponse getUserById(Long id) {
+    public GetUserResponse getUserById(Long id) throws UserNotFoundException{
         Optional<User> foundUser = userRepository.findById(id);
         User user = foundUser.orElseThrow(
                 ()->new UserNotFoundException(USER_NOT_FOUND_EXCEPTION.getMessage())
         );
-        GetUserResponse getUserResponse = buildUserResponse(user);
-        return getUserResponse;
+	    return buildUserResponse(user);
     }
 
     @Override
@@ -121,7 +101,7 @@ public class PromiscuousUserService implements UserService{
 
 
     @Override
-    public UpdateUserResponse updateProfile(UpdateUserRequest updateUserRequest, Long id) {
+    public UpdateUserResponse updateProfile(UpdateUserRequest updateUserRequest, Long id) throws JsonPatchException {
         ModelMapper modelMapper = new ModelMapper();
         String url = uploadImage(updateUserRequest.getProfileImage());
 
@@ -139,6 +119,22 @@ public class PromiscuousUserService implements UserService{
         return applyPatch(updatePatch, user);
     }
 
+    @Override
+    public UploadMediaResponse uploadMedia(MultipartFile mediaToUpload) {
+        return mediaService.uploadMedia(mediaToUpload);
+    }
+
+    @Override
+    public UploadMediaResponse uploadProfilePicture(MultipartFile mediaToUpload) {
+        return mediaService.uploadProfilePicture(mediaToUpload);
+    }
+
+    @Override
+    public ApiResponse<?> reactToMedia(MediaReactionRequest mediaReactionRequest) {
+        String response = mediaService.reactToMedia(mediaReactionRequest);
+        return ApiResponse.builder().data(response).build();
+    }
+
     private String uploadImage(MultipartFile profileImage) {
         boolean isFormWithProfileImage = profileImage !=null;
         if (isFormWithProfileImage) return cloudService.upload(profileImage);
@@ -146,17 +142,16 @@ public class PromiscuousUserService implements UserService{
     }
 
     private static Set<Interest> parseInterestsFrom(Set<String> interests){
-        Set<Interest> userInterests =interests.stream()
-                                              .map(interest->Interest.valueOf(interest.toUpperCase()))
-                                              .collect(Collectors.toSet());
-        return userInterests;
+	    return interests.stream()
+                        .map(interest->Interest.valueOf(interest.toUpperCase()))
+                        .collect(Collectors.toSet());
     }
 
-    private UpdateUserResponse applyPatch(JsonPatch updatePatch, User user) {
+    private UpdateUserResponse applyPatch(JsonPatch updatePatch, User user) throws JsonPatchException {
         ObjectMapper objectMapper = new ObjectMapper();
         //1. Convert user to JsonNode
         JsonNode userNode = objectMapper.convertValue(user, JsonNode.class);
-        try {
+
             //2. Apply patch to JsonNode from step 1
             JsonNode updatedNode = updatePatch.apply(userNode);
             //3. Convert updatedNode to user
@@ -166,9 +161,6 @@ public class PromiscuousUserService implements UserService{
             var savedUser=userRepository.save(user);
             log.info("user-->{}", savedUser);
             return new UpdateUserResponse(UPDATE_SUCCESSFUL.name());
-        }catch (JsonPatchException exception){
-            throw new PromiscuousBaseException(exception.getMessage());
-        }
     }
 
     private JsonPatch buildUpdatePatch(UpdateUserRequest updateUserRequest) {
@@ -187,32 +179,27 @@ public class PromiscuousUserService implements UserService{
         try {
             return field.get(updateUserRequest)!=null &&!list.contains(field.getName());
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw new PromiscuousBaseException(e.getMessage());
         }
     }
 
     private static ReplaceOperation buildReplaceOperation(UpdateUserRequest updateUserRequest, Field field) {
         field.setAccessible(true);
         try {
-            log.info("field::{}", field);
             String path = JSON_PATCH_PATH_PREFIX+field.getName();
             JsonPointer pointer = new JsonPointer(path);
             var value = field.get(updateUserRequest);
             TextNode node = new TextNode(value.toString());
             return new ReplaceOperation(pointer, node);
         } catch (Exception exception) {
-            throw new RuntimeException(exception);
+            throw new PromiscuousBaseException(exception.getMessage());
         }
     }
 
-    private User findUserById(Long id){
+    public User findUserById(Long id){
         Optional<User> foundUser = userRepository.findById(id);
-        User user = foundUser.orElseThrow(()->
-                new UserNotFoundException(USER_NOT_FOUND_EXCEPTION.getMessage()));
-        return user;
+	    return foundUser.orElseThrow(()->new UserNotFoundException(USER_NOT_FOUND_EXCEPTION.getMessage()));
     }
-
-
 
 
     private Pageable buildPageRequest(int page, int pageSize) {

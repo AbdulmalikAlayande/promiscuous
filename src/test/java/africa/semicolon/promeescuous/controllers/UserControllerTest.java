@@ -32,12 +32,10 @@ public class UserControllerTest {
             request.setEmail("bibeni9669@touchend.com");
             request.setPassword("password");
             String json=mapper.writeValueAsString(request);
-            mockMvc.perform(
-                    MockMvcRequestBuilders.post("/api/v1/user")
-                            .content(json)
-                            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            ).andExpect(status()
-                                             .is(HttpStatus.CREATED.value()))
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/user")
+                                                  .content(json)
+                                                  .contentType(MediaType.APPLICATION_JSON_VALUE))
+                    .andExpect(status().is(HttpStatus.CREATED.value()))
                     .andDo(print());
         } catch (Exception exception) {
             throw new RuntimeException(exception);

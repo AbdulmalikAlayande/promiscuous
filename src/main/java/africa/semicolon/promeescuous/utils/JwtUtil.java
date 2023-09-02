@@ -11,12 +11,11 @@ import static africa.semicolon.promeescuous.utils.AppUtil.APP_NAME;
 public class JwtUtil {
 
     public static String generateToken(String email){
-        String token = JWT.create()
+	    return JWT.create()
                 .withClaim("user", email)
                 .withIssuer(APP_NAME)
                 .withExpiresAt(Instant.now().plusSeconds(3600))
                 .sign(Algorithm.HMAC512("secret"));
-        return token;
     }
 
     public static boolean isValidJwt(String token){

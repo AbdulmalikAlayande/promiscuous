@@ -1,16 +1,15 @@
 package africa.semicolon.promeescuous.services;
 
 
-import africa.semicolon.promeescuous.dtos.requests.LoginRequest;
 import africa.semicolon.promeescuous.dtos.requests.RegisterUserRequest;
 import africa.semicolon.promeescuous.dtos.requests.UpdateUserRequest;
 import africa.semicolon.promeescuous.dtos.responses.ApiResponse;
 import africa.semicolon.promeescuous.dtos.responses.GetUserResponse;
-import africa.semicolon.promeescuous.dtos.responses.LoginResponse;
 import africa.semicolon.promeescuous.dtos.responses.UpdateUserResponse;
-import africa.semicolon.promeescuous.exceptions.BadCredentialsException;
 import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
 import africa.semicolon.promeescuous.models.User;
+import com.github.fge.jsonpatch.JsonPatchException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import java.util.Set;
 
 import static africa.semicolon.promeescuous.utils.AppUtil.BLANK_SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
@@ -58,27 +56,7 @@ public class UserServiceTest {
        assertThat(activateUserAccountResponse).isNotNull();
     }
 
-    @Test
-    public void testThatExceptionIsThrownWhenUserAuthenticatesWithBadCredentials(){
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("test@email.com");
-        loginRequest.setPassword("bad_password");
 
-        assertThatThrownBy(()->userService.login(loginRequest))
-                .isInstanceOf(BadCredentialsException.class);
-    }
-
-    @Test
-    public void testThatUsersCanLogin(){
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("test@email.com");
-        loginRequest.setPassword("password");
-
-        LoginResponse response = userService.login(loginRequest);
-        assertThat(response).isNotNull();
-        String accessToken = response.getAccessToken();
-        assertThat(accessToken).isNotNull();
-    }
 
     @Test
     public void getUserByIdTest(){
@@ -94,7 +72,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testThatUserCanUpdateAccount(){
+    public void testThatUserCanUpdateAccount() throws JsonPatchException {
         UpdateUserRequest updateUserRequest = buildUpdateRequest();
         UpdateUserResponse response = userService.updateProfile(updateUserRequest, 500L);
         assertThat(response).isNotNull();
@@ -110,6 +88,7 @@ public class UserServiceTest {
     }
     
     @Test
+    @SneakyThrows
     public void testThatUserCanBeSuggestedByInterest() {
         Set<String> firstInterests = Set.of("music", "reading");
         Set<String> secondInterests = Set.of("Sport", "Coding");

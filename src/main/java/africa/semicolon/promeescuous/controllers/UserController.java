@@ -1,16 +1,13 @@
 package africa.semicolon.promeescuous.controllers;
 
-
-import africa.semicolon.promeescuous.dtos.requests.LikeOrDislikeRequest;
+import africa.semicolon.promeescuous.dtos.requests.MediaReactionRequest;
 import africa.semicolon.promeescuous.dtos.requests.RegisterUserRequest;
 import africa.semicolon.promeescuous.dtos.requests.UpdateUserRequest;
 import africa.semicolon.promeescuous.dtos.requests.UploadMediaRequest;
-import africa.semicolon.promeescuous.dtos.responses.GetUserResponse;
-import africa.semicolon.promeescuous.dtos.responses.RegisterUserResponse;
-import africa.semicolon.promeescuous.dtos.responses.UpdateUserResponse;
-import africa.semicolon.promeescuous.dtos.responses.UploadMediaResponse;
-import africa.semicolon.promeescuous.models.Reaction;
+import africa.semicolon.promeescuous.dtos.responses.*;
+import africa.semicolon.promeescuous.exceptions.UserNotFoundException;
 import africa.semicolon.promeescuous.services.UserService;
+import com.github.fge.jsonpatch.JsonPatchException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,32 +27,31 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GetUserResponse> getUserById(@PathVariable Long id){
+    public ResponseEntity<GetUserResponse> getUserById(@PathVariable Long id) throws UserNotFoundException {
         GetUserResponse user = userService.getUserById(id);
         return ResponseEntity.ok().body(user);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UpdateUserResponse> updateUserProfile(@ModelAttribute UpdateUserRequest updateUserRequest, @PathVariable Long id){
+    public ResponseEntity<UpdateUserResponse> updateUserProfile(@ModelAttribute UpdateUserRequest updateUserRequest, @PathVariable Long id) throws JsonPatchException {
         UpdateUserResponse response=userService.updateProfile(updateUserRequest, id);
         return ResponseEntity.ok(response);
     }
     @PostMapping("/uploadMedia")
     public ResponseEntity<UploadMediaResponse> uploadMedia(@ModelAttribute UploadMediaRequest mediaRequest){
         MultipartFile mediaToUpload = mediaRequest.getMedia();
-        UploadMediaResponse response = mediaService.uploadMedia(mediaToUpload);
+        UploadMediaResponse response = userService.uploadMedia(mediaToUpload);
         return ResponseEntity.ok(response);
     }
     @PostMapping("uploadProfilePicture")
     public ResponseEntity<UploadMediaResponse> uploadProfilePicture(@ModelAttribute UploadMediaRequest mediaRequest){
         MultipartFile mediaToUpload = mediaRequest.getMedia();
-        UploadMediaResponse response = mediaService.uploadProfilePicture(mediaToUpload);
+        UploadMediaResponse response = userService.uploadProfilePicture(mediaToUpload);
         return ResponseEntity.ok(response);
     }
-    @PostMapping("/likeOrDislike/{id}")
-    public ResponseEntity<?> likeOrDislike(@RequestBody LikeOrDislikeRequest userReaction, @PathVariable Long id){
-        Reaction mediaReaction = userReaction.getReaction();
-        String response = mediaService.likeOrDislike(mediaReaction,id);
+    @PostMapping("/react/{id}")
+    public ResponseEntity<?> reactToMedia(@RequestBody MediaReactionRequest mediaReactionRequest, @PathVariable String id){
+        ApiResponse<?> response = userService.reactToMedia(mediaReactionRequest);
         return ResponseEntity.ok(response);
     }
 

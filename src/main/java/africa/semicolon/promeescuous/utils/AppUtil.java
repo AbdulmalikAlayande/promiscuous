@@ -35,8 +35,7 @@ public class AppUtil {
     public static final String TEST_IMAGE_LOCATION = "C:\\Users\\semicolon\\Documents\\spring_projects\\prom-scuous\\src\\test\\resources\\images\\puppies.jpg";
     public static String generateActivationLink(String baseUrl, String email){
         String token = generateToken(email);
-        String activationLink = baseUrl+ACTIVATE_ACCOUNT_PATH+token;
-        return activationLink;
+	    return baseUrl+ACTIVATE_ACCOUNT_PATH+token;
     }
 
     public static boolean matches(String first, String second){
@@ -50,8 +49,7 @@ public class AppUtil {
         Path templateLocation = Paths.get(MAIL_TEMPLATE_LOCATION);
         try {
             List<String> fileContents = Files.readAllLines(templateLocation);
-            String template = String.join(EMPTY_STRING, fileContents);
-            return template;
+	        return String.join(EMPTY_STRING, fileContents);
         }catch (IOException exception){
             throw new PromiscuousBaseException(exception.getMessage());
         }
