@@ -6,10 +6,14 @@ import africa.semicolon.promeescuous.dtos.responses.*;
 import africa.semicolon.promeescuous.exceptions.AccountActivationFailedException;
 import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
 import africa.semicolon.promeescuous.exceptions.UserNotFoundException;
+<<<<<<< HEAD
 import africa.semicolon.promeescuous.models.Address;
 import africa.semicolon.promeescuous.models.Interest;
 import africa.semicolon.promeescuous.models.Location;
 import africa.semicolon.promeescuous.models.User;
+=======
+import africa.semicolon.promeescuous.models.*;
+>>>>>>> eb5c41c8c8d219dd8bd0220875a1f0978eba3560
 import africa.semicolon.promeescuous.repositories.UserRepository;
 import africa.semicolon.promeescuous.services.cloud.CloudService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,6 +30,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,6 +44,7 @@ import java.util.stream.Collectors;
 import static africa.semicolon.promeescuous.dtos.responses.ResponseMessage.*;
 import static africa.semicolon.promeescuous.dtos.responses.SuccessResponse.UPDATE_SUCCESSFUL;
 import static africa.semicolon.promeescuous.exceptions.ExceptionMessage.*;
+import static africa.semicolon.promeescuous.models.Role.CUSTOMER;
 import static africa.semicolon.promeescuous.utils.AppUtil.*;
 import static africa.semicolon.promeescuous.utils.JwtUtil.extractEmailFrom;
 import static africa.semicolon.promeescuous.utils.JwtUtil.isValidJwt;
@@ -43,24 +52,30 @@ import static africa.semicolon.promeescuous.utils.JwtUtil.isValidJwt;
 @Service
 @Slf4j
 @AllArgsConstructor
-public class PromiscuousUserService implements UserService{
+public class PromiscuousUserService implements UserService {
     private final UserRepository userRepository;
     private final MailService mailService;
     private final AppConfig appConfig;
     private final CloudService cloudService;
+<<<<<<< HEAD
     private final AddressService addressService;
     private final ModelMapper mapper;
 
+=======
+>>>>>>> eb5c41c8c8d219dd8bd0220875a1f0978eba3560
     private final MediaService mediaService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public RegisterUserResponse register(RegisterUserRequest registerUserRequest) {
         String email = registerUserRequest.getEmail();
         String password = registerUserRequest.getPassword();
+        String passwordHash = passwordEncoder.encode(password);
         User user = new User();
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(passwordHash);
         user.setAddress(new Address());
+        user.setRole(CUSTOMER);
         User savedUser = userRepository.save(user);
         EmailNotificationRequest request = buildEmailRequest(savedUser);
         mailService.send(request);
@@ -85,7 +100,14 @@ public class PromiscuousUserService implements UserService{
         User user = foundUser.orElseThrow(
                 ()->new UserNotFoundException(USER_NOT_FOUND_EXCEPTION.getMessage())
         );
+<<<<<<< HEAD
 	    return buildUserResponse(user);
+=======
+        Media media = mediaService.getMediaByUser(user);
+        GetUserResponse getUserResponse = buildUserResponse(user);
+        getUserResponse.setProfileImage(media.getUrl());
+        return getUserResponse;
+>>>>>>> eb5c41c8c8d219dd8bd0220875a1f0978eba3560
     }
 
     @Override
@@ -94,8 +116,8 @@ public class PromiscuousUserService implements UserService{
         Page<User> usersPage = userRepository.findAll(pageable);
         List<User> foundUsers = usersPage.getContent();
         return foundUsers.stream()
-                .map(user-> buildUserResponse(user))
-                .toList();
+                         .map(user-> buildUserResponse(user))
+                         .toList();
     }
 
 
@@ -103,9 +125,9 @@ public class PromiscuousUserService implements UserService{
     @Override
     public UpdateUserResponse updateProfile(UpdateUserRequest updateUserRequest, Long id) throws JsonPatchException {
         ModelMapper modelMapper = new ModelMapper();
-        String url = uploadImage(updateUserRequest.getProfileImage());
-
         User user = findUserById(id);
+
+        mediaService.uploadMedia(updateUserRequest.getProfileImage(), user);
 
         Set<String> userInterests = updateUserRequest.getInterests();
         Set<Interest> interests = parseInterestsFrom(userInterests);
@@ -121,7 +143,7 @@ public class PromiscuousUserService implements UserService{
 
     @Override
     public UploadMediaResponse uploadMedia(MultipartFile mediaToUpload) {
-        return mediaService.uploadMedia(mediaToUpload);
+        return null;
     }
 
     @Override
@@ -133,6 +155,15 @@ public class PromiscuousUserService implements UserService{
     public ApiResponse<?> reactToMedia(MediaReactionRequest mediaReactionRequest) {
         String response = mediaService.reactToMedia(mediaReactionRequest);
         return ApiResponse.builder().data(response).build();
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.readByEmail(email).orElseThrow(
+                ()->new UserNotFoundException(
+                        String.format(USER_WITH_EMAIL_NOT_FOUND_EXCEPTION.getMessage(), email)
+                )
+        );
     }
 
     private String uploadImage(MultipartFile profileImage) {
@@ -292,4 +323,7 @@ public class PromiscuousUserService implements UserService{
         request.setMailContent(mailContent);
         return request;
     }
+
+
+
 }

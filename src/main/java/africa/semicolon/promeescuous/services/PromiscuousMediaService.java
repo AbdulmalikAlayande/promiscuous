@@ -5,6 +5,7 @@ import africa.semicolon.promeescuous.dtos.responses.UploadMediaResponse;
 import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
 import africa.semicolon.promeescuous.models.Media;
 import africa.semicolon.promeescuous.models.MediaReaction;
+import africa.semicolon.promeescuous.models.User;
 import africa.semicolon.promeescuous.repositories.MediaRepository;
 import africa.semicolon.promeescuous.services.cloud.CloudService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import static africa.semicolon.promeescuous.dtos.responses.ResponseMessage.SUCCESS;
 import static africa.semicolon.promeescuous.exceptions.ExceptionMessage.MEDIA_NOT_FOUND;
+import static africa.semicolon.promeescuous.exceptions.ExceptionMessage.RESOURCE_NOT_FOUND;
 
 
 @Service
@@ -26,8 +28,12 @@ public class PromiscuousMediaService implements MediaService{
         this.mediaRepository = mediaRepository;
     }
     @Override
-    public UploadMediaResponse uploadMedia(MultipartFile file) {
+    public UploadMediaResponse uploadMedia(MultipartFile file, User user) {
         String url = cloudService.upload(file);
+        Media media = new Media();
+        media.setUrl(url);
+        media.setUser(user);
+        mediaRepository.save(media);
         UploadMediaResponse uploadMediaResponse = new UploadMediaResponse();
         uploadMediaResponse.setMessage(url);
         return uploadMediaResponse;
@@ -52,6 +58,13 @@ public class PromiscuousMediaService implements MediaService{
         media.getReactions().add(reaction);
         mediaRepository.save(media);
         return SUCCESS.name();
+    }
+
+    @Override
+    public Media getMediaByUser(User user) {
+        return mediaRepository.findByUser(user).orElseThrow(
+                ()->new PromiscuousBaseException(RESOURCE_NOT_FOUND.name())
+        );
     }
 
 

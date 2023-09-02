@@ -1,21 +1,16 @@
 package africa.semicolon.promeescuous.utils;
 
 import africa.semicolon.promeescuous.exceptions.PromiscuousBaseException;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
 import java.util.List;
 
-import static africa.semicolon.promeescuous.utils.JwtUtil.generateToken;
+import static africa.semicolon.promeescuous.utils.JwtUtil.generateVerificationToken;
 
 public class AppUtil {
-
     public static final String APP_NAME = "promiscuous inc.";
     public static final String APP_EMAIL = "noreply@promiscuous.africa";
 
@@ -34,8 +29,14 @@ public class AppUtil {
 
     public static final String TEST_IMAGE_LOCATION = "C:\\Users\\semicolon\\Documents\\spring_projects\\prom-scuous\\src\\test\\resources\\images\\puppies.jpg";
     public static String generateActivationLink(String baseUrl, String email){
+<<<<<<< HEAD
         String token = generateToken(email);
 	    return baseUrl+ACTIVATE_ACCOUNT_PATH+token;
+=======
+        String token = generateVerificationToken(email);
+        String activationLink = baseUrl+ACTIVATE_ACCOUNT_PATH+token;
+        return activationLink;
+>>>>>>> eb5c41c8c8d219dd8bd0220875a1f0978eba3560
     }
 
     public static boolean matches(String first, String second){
@@ -53,6 +54,11 @@ public class AppUtil {
         }catch (IOException exception){
             throw new PromiscuousBaseException(exception.getMessage());
         }
+    }
+
+
+    public static List<String> getPublicPaths(){
+        return List.of("/api/v1/user", "/login");
     }
 
 

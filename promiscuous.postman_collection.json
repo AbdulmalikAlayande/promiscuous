@@ -1,0 +1,227 @@
+{
+	"info": {
+		"_postman_id": "d6e68192-7128-4690-88a5-bb6db13ddc16",
+		"name": "promiscuous",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11721610",
+		"_collection_link": "https://warped-eclipse-237885.postman.co/workspace/My-Workspace~3b4ba347-0372-42a9-8ab9-04c443268a3d/collection/11721610-d6e68192-7128-4690-88a5-bb6db13ddc16?action=share&source=collection_link&creator=11721610"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"hovosi1284@pbridal.com\",\r\n    \"password\":\"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/user",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJDVVNUT01FUiJdLCJpc3MiOiJwcm9taXNjdW91cyBpbmMuIiwiZXhwIjoxNjkzNDE1NzAwfQ.bsufl8MsHGNtVcuCPt12JKXww0vjBBJeF62gUbWHf_o8S_SHaSAd-fI3UPOXV3wG2QEUVcDK3JGl6gW7lvuq5A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "firstName",
+									"value": "Femi",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "Djfemz",
+									"type": "text"
+								},
+								{
+									"key": "dateOfBirth",
+									"value": "2023-08-22",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "whatever",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "others",
+									"type": "text"
+								},
+								{
+									"key": "interests",
+									"value": "SWIMMING,COOKING",
+									"type": "text"
+								},
+								{
+									"key": "profileImage",
+									"type": "file",
+									"src": "/C:/Users/semicolon/Pictures/wallpapers/WhatsApp Image 2023-06-05 at 07.52.54.jpg"
+								},
+								{
+									"key": "phoneNumber",
+									"value": "07098765432",
+									"type": "text"
+								},
+								{
+									"key": "houseNumber",
+									"value": "312",
+									"type": "text"
+								},
+								{
+									"key": "street",
+									"value": "Herbert Macaulay way",
+									"type": "text"
+								},
+								{
+									"key": "state",
+									"value": "Lagos",
+									"type": "text"
+								},
+								{
+									"key": "country",
+									"value": "Ghana",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/user/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"user",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJDVVNUT01FUiJdLCJpc3MiOiJwcm9taXNjdW91cyBpbmMuIiwiZXhwIjoxNjkzNDAxNjQ1fQ.AHSW3ewt7Ew8_pQaXFhYyMcNn7SP1nlsCIffyTeWao5fOZpc0twYUcRLx08HxTHrbn1URhWDNpYfLw_SclpFjg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"hovosi1284@pbridal.com\",\r\n    \"password\":\"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJDVVNUT01FUiJdLCJpc3MiOiJwcm9taXNjdW91cyBpbmMuIiwiZXhwIjoxNjkzNDE1NzAwfQ.bsufl8MsHGNtVcuCPt12JKXww0vjBBJeF62gUbWHf_o8S_SHaSAd-fI3UPOXV3wG2QEUVcDK3JGl6gW7lvuq5A",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/api/v1/user/:id",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

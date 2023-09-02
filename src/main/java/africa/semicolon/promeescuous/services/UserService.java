@@ -1,6 +1,5 @@
 package africa.semicolon.promeescuous.services;
 
-import africa.semicolon.promeescuous.dtos.requests.LoginRequest;
 import africa.semicolon.promeescuous.dtos.requests.MediaReactionRequest;
 import africa.semicolon.promeescuous.dtos.requests.RegisterUserRequest;
 import africa.semicolon.promeescuous.dtos.requests.UpdateUserRequest;
@@ -34,4 +33,6 @@ public interface UserService {
     UploadMediaResponse uploadProfilePicture(MultipartFile mediaToUpload);
 
     ApiResponse<?> reactToMedia(MediaReactionRequest mediaReactionRequest);
+
+    User getUserByEmail(String email);
 }
