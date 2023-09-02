@@ -29,14 +29,8 @@ public class AppUtil {
 
     public static final String TEST_IMAGE_LOCATION = "C:\\Users\\semicolon\\Documents\\spring_projects\\prom-scuous\\src\\test\\resources\\images\\puppies.jpg";
     public static String generateActivationLink(String baseUrl, String email){
-<<<<<<< HEAD
-        String token = generateToken(email);
-	    return baseUrl+ACTIVATE_ACCOUNT_PATH+token;
-=======
         String token = generateVerificationToken(email);
-        String activationLink = baseUrl+ACTIVATE_ACCOUNT_PATH+token;
-        return activationLink;
->>>>>>> eb5c41c8c8d219dd8bd0220875a1f0978eba3560
+        return baseUrl+ACTIVATE_ACCOUNT_PATH+token;
     }
 
     public static boolean matches(String first, String second){
